@@ -1,0 +1,685 @@
+/* =========================================================
+   CHOR VS POLICE — STYLES
+   A playful, comic-strip styled chase game.
+   Palette: sunny sky blue, road charcoal, siren red/blue,
+   warm cream UI cards with bold black "comic" outlines.
+   ========================================================= */
+
+:root {
+  /* --- Color tokens --- */
+  --sky-top: #6EC6FF;
+  --sky-bottom: #CFF3FF;
+  --road: #45454F;
+  --road-line: #FFE066;
+  --grass: #7BC950;
+  --grass-dark: #5FAE3C;
+
+  --cream: #FFF9EE;
+  --ink: #2D3142;
+  --police-blue: #2E5BFF;
+  --siren-red: #FF4757;
+  --thief-orange: #FF9F43;
+  --gold: #FFD93D;
+  --good-green: #2ECC71;
+
+  --shadow-hard: 4px 4px 0 rgba(45, 49, 66, 0.85);
+  --shadow-soft: 0 6px 16px rgba(45, 49, 66, 0.25);
+
+  --font-display: 'Bangers', cursive;
+  --font-body: 'Nunito', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: linear-gradient(180deg, #BFE9FF 0%, #E8F8E8 100%);
+  color: var(--ink);
+  display: flex;
+  justify-content: center;
+  padding: 12px;
+  min-height: 100vh;
+}
+
+.app {
+  width: 100%;
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ========================= HUD ========================= */
+
+.hud {
+  background: var(--cream);
+  border: 4px solid var(--ink);
+  border-radius: 18px;
+  box-shadow: var(--shadow-hard);
+  padding: 10px 16px;
+  text-align: center;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 6vw, 2.4rem);
+  letter-spacing: 2px;
+  margin: 4px 0 8px;
+  color: var(--police-blue);
+  -webkit-text-stroke: 1.5px var(--ink);
+  text-shadow: 3px 3px 0 var(--gold);
+}
+
+.title .vs {
+  color: var(--siren-red);
+  -webkit-text-stroke: 1.5px var(--ink);
+}
+
+.hud-stats {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.stat {
+  flex: 1 1 0;
+  min-width: 70px;
+  background: #fff;
+  border: 3px solid var(--ink);
+  border-radius: 12px;
+  padding: 4px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #8A8FA3;
+}
+
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  letter-spacing: 1px;
+}
+
+.stat--score .stat-value { color: var(--police-blue); }
+.stat--level .stat-value { color: var(--thief-orange); }
+.stat--timer .stat-value { color: var(--siren-red); }
+.stat--high .stat-value { color: var(--good-green); }
+
+.stat--timer.low-time .stat-value {
+  animation: pulseRed 0.6s infinite alternate;
+}
+
+@keyframes pulseRed {
+  from { color: var(--siren-red); transform: scale(1); }
+  to   { color: #ffb3b8; transform: scale(1.15); }
+}
+
+/* ===================== GAME WRAPPER ===================== */
+
+.game-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.game-area {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 60vh;
+  overflow: hidden;
+  border: 4px solid var(--ink);
+  border-radius: 18px;
+  box-shadow: var(--shadow-hard);
+  background: var(--sky-bottom);
+}
+
+/* ---------- Parallax layers ---------- */
+
+.layer {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Sky layer: gradient + sun + clouds */
+.sky {
+  top: 0;
+  height: 55%;
+  background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 100%);
+}
+
+.sun {
+  position: absolute;
+  top: 8%;
+  right: 8%;
+  width: 13%;
+  aspect-ratio: 1;
+  background: radial-gradient(circle, #FFF6C9 0%, var(--gold) 70%);
+  border-radius: 50%;
+  border: 3px solid var(--ink);
+  box-shadow: 0 0 25px rgba(255, 217, 61, 0.8);
+}
+
+.cloud {
+  position: absolute;
+  font-size: clamp(1.4rem, 5vw, 2.4rem);
+  filter: drop-shadow(1px 2px 0 rgba(45,49,66,0.25));
+  animation: driftCloud linear infinite;
+}
+.cloud1 { top: 10%;  animation-duration: 38s; }
+.cloud2 { top: 28%;  animation-duration: 55s; animation-delay: -10s; }
+.cloud3 { top: 4%;   animation-duration: 70s; animation-delay: -30s; }
+
+@keyframes driftCloud {
+  from { transform: translateX(110vw); }
+  to   { transform: translateX(-30vw); }
+}
+
+/* Scenery layer: scrolling hills / buildings strip, driven by JS via translateX */
+.scenery {
+  top: 25%;
+  height: 30%;
+}
+
+.scenery-track {
+  position: absolute;
+  top: 0; left: 0;
+  height: 100%;
+  width: 200%;
+  display: flex;
+  align-items: flex-end;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      var(--grass) 0 12%,
+      var(--grass-dark) 12% 13%,
+      var(--grass) 13% 25%
+    );
+  will-change: transform;
+}
+
+.scenery-track::before {
+  content: '🏠 🌳 🏢 🌲 🏬 🌳 🏠 🌲 🏢 🌳 🏠 🌲 🏬 🌳 🏠 🌲 🏢 🌳 🏠 🌲';
+  position: absolute;
+  bottom: 6%;
+  left: 0;
+  width: 100%;
+  display: block;
+  font-size: clamp(1rem, 3.4vw, 1.8rem);
+  letter-spacing: clamp(10px, 4vw, 30px);
+  white-space: nowrap;
+  word-spacing: clamp(10px, 4vw, 30px);
+}
+
+/* Road layer: dark asphalt with scrolling dashed center line, driven by JS */
+.road {
+  bottom: 0;
+  height: 45%;
+  background: var(--road);
+  border-top: 4px solid #2c2c33;
+}
+
+.road-track {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 200%;
+  height: 10%;
+  transform: translateY(-50%);
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--road-line) 0 8%,
+    transparent 8% 16%
+  );
+  will-change: transform;
+}
+
+/* Items layer holds dynamically-spawned obstacles & coins */
+.items {
+  top: 0;
+  height: 100%;
+  pointer-events: none;
+}
+
+.item {
+  position: absolute;
+  font-size: clamp(1.4rem, 5vw, 2.2rem);
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(2px 3px 0 rgba(45,49,66,0.35));
+}
+
+.item--coin {
+  animation: spinCoin 1s linear infinite;
+}
+
+@keyframes spinCoin {
+  0%   { transform: translate(-50%, -50%) scaleX(1); }
+  50%  { transform: translate(-50%, -50%) scaleX(0.2); }
+  100% { transform: translate(-50%, -50%) scaleX(1); }
+}
+
+/* ---------- Characters ---------- */
+
+.character {
+  position: absolute;
+  bottom: 6%;
+  font-size: clamp(2rem, 8vw, 3.4rem);
+  line-height: 1;
+  filter: drop-shadow(2px 4px 0 rgba(45,49,66,0.4));
+  transform-origin: bottom center;
+  z-index: 5;
+}
+
+.thief {
+  left: 70%;
+  animation: run 0.35s ease-in-out infinite alternate;
+}
+
+.police {
+  left: 8%;
+  animation: drive 0.25s ease-in-out infinite alternate;
+  z-index: 6;
+}
+
+@keyframes run {
+  from { transform: translateY(0) rotate(-3deg); }
+  to   { transform: translateY(-10%) rotate(3deg); }
+}
+
+@keyframes drive {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-6%); }
+}
+
+.police.boosting {
+  animation: drive 0.12s ease-in-out infinite alternate;
+}
+
+.police.hit {
+  animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px) rotate(-4deg); }
+  40% { transform: translateX(8px) rotate(4deg); }
+  60% { transform: translateX(-6px) rotate(-2deg); }
+  80% { transform: translateX(6px) rotate(2deg); }
+}
+
+.thief.caught {
+  animation: caughtSpin 0.6s ease forwards;
+}
+
+@keyframes caughtSpin {
+  0%   { transform: scale(1) rotate(0deg); opacity: 1; }
+  60%  { transform: scale(1.4) rotate(180deg); opacity: 1; }
+  100% { transform: scale(0.2) rotate(360deg); opacity: 0; }
+}
+
+/* Flash overlay for impacts / catches */
+.flash {
+  position: absolute;
+  inset: 0;
+  background: var(--siren-red);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.flash.hit-flash {
+  animation: flashFade 0.35s ease;
+}
+
+.flash.catch-flash {
+  background: var(--good-green);
+  animation: flashFade 0.5s ease;
+}
+
+@keyframes flashFade {
+  0%   { opacity: 0.55; }
+  100% { opacity: 0; }
+}
+
+/* ===================== OVERLAYS ===================== */
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(45, 49, 66, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+  padding: 12px;
+  transition: opacity 0.25s ease;
+}
+
+.overlay.hidden {
+  display: none;
+}
+
+.overlay-card {
+  background: var(--cream);
+  border: 4px solid var(--ink);
+  border-radius: 18px;
+  box-shadow: var(--shadow-hard);
+  padding: 18px 22px;
+  max-width: 90%;
+  text-align: center;
+  animation: popIn 0.3s ease;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.overlay-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 7vw, 2.2rem);
+  letter-spacing: 2px;
+  margin: 0 0 8px;
+  color: var(--police-blue);
+  -webkit-text-stroke: 1px var(--ink);
+}
+
+.overlay-title--bad { color: var(--siren-red); }
+.overlay-title--good { color: var(--good-green); }
+
+.overlay-text {
+  font-size: 0.95rem;
+  margin: 0 0 12px;
+  line-height: 1.4;
+}
+
+.controls-info {
+  background: #fff;
+  border: 2px dashed var(--ink);
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-bottom: 14px;
+  font-size: 0.85rem;
+  text-align: left;
+}
+
+.control-row {
+  margin: 4px 0;
+}
+
+kbd {
+  display: inline-block;
+  background: var(--ink);
+  color: #fff;
+  border-radius: 4px;
+  padding: 1px 7px;
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 0.8rem;
+  margin-right: 4px;
+}
+
+.result-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #fff;
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  padding: 8px 14px;
+  margin-bottom: 14px;
+  font-size: 0.95rem;
+}
+
+/* ===================== TOAST (Level Up) ===================== */
+
+.toast {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 25;
+  background: var(--gold);
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  padding: 6px 16px;
+  box-shadow: var(--shadow-hard);
+  animation: toastPop 1.6s ease forwards;
+}
+
+.toast.hidden { display: none; }
+
+.toast-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 4.5vw, 1.5rem);
+  letter-spacing: 1px;
+  color: var(--ink);
+}
+
+@keyframes toastPop {
+  0%   { opacity: 0; transform: translate(-50%, -20px) scale(0.8); }
+  15%  { opacity: 1; transform: translate(-50%, 0) scale(1.05); }
+  25%  { transform: translate(-50%, 0) scale(1); }
+  85%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -10px) scale(0.95); }
+}
+
+/* ===================== GAP METER ===================== */
+
+.gap-meter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--cream);
+  border: 3px solid var(--ink);
+  border-radius: 12px;
+  padding: 6px 10px;
+  box-shadow: var(--shadow-hard);
+}
+
+.gap-icon {
+  font-size: 1.3rem;
+}
+
+.gap-track {
+  position: relative;
+  flex: 1;
+  height: 14px;
+  background: #E0E0E0;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.gap-fill {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  background: linear-gradient(90deg, var(--good-green), var(--gold), var(--siren-red));
+  transform-origin: left;
+  transition: transform 0.12s linear;
+}
+
+.gap-marker {
+  position: absolute;
+  top: -3px;
+  left: 0;
+  width: 4px;
+  height: 20px;
+  background: var(--ink);
+  border-radius: 2px;
+  transition: left 0.12s linear;
+}
+
+/* ===================== SPEED GAUGES ===================== */
+
+.speed-panel {
+  display: flex;
+  gap: 8px;
+}
+
+.gauge {
+  flex: 1;
+  background: var(--cream);
+  border: 3px solid var(--ink);
+  border-radius: 12px;
+  padding: 6px 10px;
+  box-shadow: var(--shadow-hard);
+}
+
+.gauge-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.gauge-track {
+  margin-top: 4px;
+  height: 10px;
+  background: #E0E0E0;
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.gauge-fill {
+  height: 100%;
+  width: 0%;
+  transition: width 0.12s linear;
+  border-radius: 4px;
+}
+
+.gauge-fill--police { background: var(--police-blue); }
+.gauge-fill--thief { background: var(--thief-orange); }
+
+/* ===================== CONTROLS / FOOTER ===================== */
+
+.controls {
+  background: var(--cream);
+  border: 4px solid var(--ink);
+  border-radius: 18px;
+  box-shadow: var(--shadow-hard);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.control-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.ctrl-btn {
+  flex: 1;
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 1.4rem;
+  line-height: 1.3;
+  border: 3px solid var(--ink);
+  border-radius: 12px;
+  padding: 8px 4px;
+  cursor: pointer;
+  background: #fff;
+  box-shadow: 3px 3px 0 rgba(45,49,66,0.85);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  user-select: none;
+}
+
+.ctrl-btn span {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.ctrl-btn:active,
+.ctrl-btn.pressed {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 rgba(45,49,66,0.85);
+}
+
+.ctrl-btn--slow { background: #DDEBFF; }
+.ctrl-btn--fast { background: #FFE3CC; }
+.ctrl-btn--boost {
+  background: var(--gold);
+}
+
+.game-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+/* ===================== BUTTONS (general) ===================== */
+
+.btn {
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 1rem;
+  border: 3px solid var(--ink);
+  border-radius: 12px;
+  padding: 10px 22px;
+  cursor: pointer;
+  background: var(--police-blue);
+  color: #fff;
+  box-shadow: 3px 3px 0 rgba(45,49,66,0.85);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  margin: 4px;
+}
+
+.btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 rgba(45,49,66,0.85);
+}
+
+.btn--primary { background: var(--police-blue); color: #fff; }
+.btn--secondary { background: #fff; color: var(--ink); }
+.btn--small { font-size: 0.85rem; padding: 8px 14px; }
+.btn--mute { background: var(--gold); color: var(--ink); }
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===================== RESPONSIVE ===================== */
+
+@media (max-width: 480px) {
+  .hud-stats { gap: 4px; }
+  .stat { min-width: 60px; padding: 3px 4px; }
+  .stat-value { font-size: 1.1rem; }
+  .ctrl-btn { font-size: 1.1rem; padding: 6px 2px; }
+  .overlay-text { font-size: 0.85rem; }
+  .game-buttons .btn--small { padding: 6px 10px; font-size: 0.78rem; }
+}
+
+@media (min-width: 700px) {
+  .game-area { max-height: 480px; }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .cloud, .thief, .police, .item--coin {
+    animation: none !important;
+  }
+}

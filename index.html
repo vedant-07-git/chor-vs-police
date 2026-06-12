@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+  <title>Chor vs Police 🚓 — Catch the Thief!</title>
+
+  <!-- Fonts: Bangers for the comic-style display headings, Nunito for clean body/UI text -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app">
+
+    <!-- ===================== HEADER / HUD ===================== -->
+    <header class="hud">
+      <h1 class="title">🚓 Chor <span class="vs">vs</span> Police 🏃</h1>
+
+      <div class="hud-stats">
+        <div class="stat stat--score">
+          <span class="stat-label">Score</span>
+          <span class="stat-value" id="scoreValue">0</span>
+        </div>
+        <div class="stat stat--level">
+          <span class="stat-label">Level</span>
+          <span class="stat-value" id="levelValue">1</span>
+        </div>
+        <div class="stat stat--timer">
+          <span class="stat-label">Time</span>
+          <span class="stat-value" id="timerValue">30</span>
+        </div>
+        <div class="stat stat--high">
+          <span class="stat-label">Best</span>
+          <span class="stat-value" id="highScoreValue">0</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===================== GAME AREA ===================== -->
+    <main class="game-wrapper">
+
+      <div class="game-area" id="gameArea">
+
+        <!-- Parallax background layers -->
+        <div class="layer sky">
+          <div class="sun"></div>
+          <div class="cloud cloud1">☁️</div>
+          <div class="cloud cloud2">☁️</div>
+          <div class="cloud cloud3">☁️</div>
+        </div>
+
+        <div class="layer scenery" id="scenery">
+          <div class="scenery-track" id="sceneryTrack"></div>
+        </div>
+
+        <div class="layer road" id="road">
+          <div class="road-track" id="roadTrack"></div>
+        </div>
+
+        <!-- Dynamic obstacles & coins get injected here -->
+        <div class="layer items" id="itemsLayer"></div>
+
+        <!-- Characters -->
+        <div class="character thief" id="thief">🏃‍♂️</div>
+        <div class="character police" id="police">🚓</div>
+
+        <!-- Flash overlay for hits / catches -->
+        <div class="flash" id="flash"></div>
+
+        <!-- ===================== OVERLAYS ===================== -->
+
+        <!-- Start Screen -->
+        <div class="overlay" id="startScreen">
+          <div class="overlay-card">
+            <h2 class="overlay-title">🚓 Chor vs Police 🏃</h2>
+            <p class="overlay-text">
+              The thief is making a run for it! Control your police car's speed to
+              close the gap and catch him before time runs out.
+            </p>
+            <div class="controls-info">
+              <div class="control-row"><kbd>W</kbd> / <kbd>↑</kbd> Accelerate</div>
+              <div class="control-row"><kbd>S</kbd> / <kbd>↓</kbd> Slow Down</div>
+              <div class="control-row"><kbd>Space</kbd> Nitro Boost</div>
+              <div class="control-row">🪙 Collect coins · 🚧 Avoid obstacles</div>
+            </div>
+            <button class="btn btn--primary" id="startBtn">▶ Start Chase</button>
+          </div>
+        </div>
+
+        <!-- Pause Screen -->
+        <div class="overlay hidden" id="pauseScreen">
+          <div class="overlay-card">
+            <h2 class="overlay-title">⏸ Paused</h2>
+            <p class="overlay-text">Catch your breath, officer.</p>
+            <button class="btn btn--primary" id="resumeBtn">▶ Resume</button>
+            <button class="btn btn--secondary" id="restartFromPauseBtn">🔄 Restart</button>
+          </div>
+        </div>
+
+        <!-- Level Up Toast -->
+        <div class="toast hidden" id="levelToast">
+          <div class="toast-content">
+            <span class="toast-emoji">🎉</span>
+            <span class="toast-text" id="levelToastText">Caught! Level 2</span>
+          </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div class="overlay hidden" id="gameOverScreen">
+          <div class="overlay-card">
+            <h2 class="overlay-title overlay-title--bad">⏰ Time's Up!</h2>
+            <p class="overlay-text" id="gameOverText">The thief got away this time!</p>
+            <div class="result-row">
+              <div>Score: <strong id="finalScore">0</strong></div>
+              <div>Level Reached: <strong id="finalLevel">1</strong></div>
+              <div>Best: <strong id="finalHigh">0</strong></div>
+            </div>
+            <button class="btn btn--primary" id="restartFromGameOverBtn">🔄 Try Again</button>
+          </div>
+        </div>
+
+        <!-- Victory Screen -->
+        <div class="overlay hidden" id="victoryScreen">
+          <div class="overlay-card overlay-card--victory">
+            <h2 class="overlay-title overlay-title--good">🏆 Case Closed!</h2>
+            <p class="overlay-text">You caught the thief every time. Top-tier police work, officer!</p>
+            <div class="result-row">
+              <div>Score: <strong id="victoryScore">0</strong></div>
+              <div>Best: <strong id="victoryHigh">0</strong></div>
+            </div>
+            <button class="btn btn--primary" id="restartFromVictoryBtn">🔄 Play Again</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Gap meter: shows distance between police and thief -->
+      <div class="gap-meter">
+        <span class="gap-icon">🚓</span>
+        <div class="gap-track">
+          <div class="gap-fill" id="gapFill"></div>
+          <div class="gap-marker" id="gapMarker"></div>
+        </div>
+        <span class="gap-icon">🏃</span>
+      </div>
+
+      <!-- Speed gauges -->
+      <div class="speed-panel">
+        <div class="gauge">
+          <span class="gauge-label">🚓 Police Speed</span>
+          <div class="gauge-track"><div class="gauge-fill gauge-fill--police" id="policeSpeedFill"></div></div>
+        </div>
+        <div class="gauge">
+          <span class="gauge-label">🏃 Thief Speed</span>
+          <div class="gauge-track"><div class="gauge-fill gauge-fill--thief" id="thiefSpeedFill"></div></div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- ===================== CONTROLS ===================== -->
+    <footer class="controls">
+      <div class="control-buttons">
+        <button class="ctrl-btn ctrl-btn--slow" id="slowBtn" aria-label="Slow Down">🐢<br><span>Slow</span></button>
+        <button class="ctrl-btn ctrl-btn--boost" id="boostBtn" aria-label="Boost">🚀<br><span>Boost</span></button>
+        <button class="ctrl-btn ctrl-btn--fast" id="fastBtn" aria-label="Accelerate">🏎️<br><span>Go!</span></button>
+      </div>
+      <div class="game-buttons">
+        <button class="btn btn--small" id="pauseBtn">⏸ Pause</button>
+        <button class="btn btn--small btn--secondary" id="restartBtn">🔄 Restart</button>
+        <button class="btn btn--small btn--mute" id="muteBtn">🔊</button>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
