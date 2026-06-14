@@ -71,10 +71,10 @@ cd chor-vs-police
 ### 🐳 Option 2 — Run with Docker
 ```bash
 # Pull the latest image from Docker Hub
-docker pull vedantsatpute07/chor-vs-police:latest
+docker pull vedantsatpute07/chor-vs-police:v2
 
 # Run the container
-docker run -d -P --name chor-vs-police vedantsatpute07/chor-vs-police:latest
+docker run -d -P --name chor-vs-police vedantsatpute07/chor-vs-police:v2
 
 # Check the assigned port
 docker ps
@@ -111,7 +111,7 @@ This project was deployed using:
 
 - **AWS EC2** — Ubuntu instance used to clone the repo, build the Docker image, and run the container
 - **Docker** — containerized the game using Nginx to serve static files
-- **Docker Hub** — image pushed and versioned (`v1`, `v2`, `latest`)
+- **Docker Hub** — image pushed and versioned (`latest`, `v1`, `v2`)
 - **GitHub** — source code version controlled and kept in sync with EC2
 
 ```
@@ -183,5 +183,9 @@ Live Game 🎮
 This project is open source and available under the [MIT License](LICENSE).
 
 ---
+#---
 
+#🎉 Congratulations!
+You have successfully set up **Chor vs Police** and run your first Dockerized web application!
+You just learned how to build, ship, and run an app using **Git → GitHub → EC2 → Docker → Docker Hub**. That's a real DevOps pipeline! 🚀
 > Made with ❤️ and a lot of police sirens 🚨
