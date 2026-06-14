@@ -1,4 +1,4 @@
-# chor-vs-police 🚓  
+# chor-vs-police 🚓💨🏃🏻‍➡️  
 A simple Chor vs Police game built with HTML, CSS, and JavaScript.
 # 🚓 Chor vs Police — Catch the Thief!
 
