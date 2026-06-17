@@ -61,14 +61,7 @@ chor-vs-police/
 
 ## 🚀 Getting Started
 
-### ▶️ Option 1 — Run Directly in Browser
-```bash
-git clone https://github.com/vedant-07-git/chor-vs-police.git
-cd chor-vs-police
-# Just open index.html in your browser
-```
-
-### 🐳 Option 2 — Run with Docker
+### 🐳 Option 1 — Run with Docker
 ```bash
 # Pull the latest image from Docker Hub
 docker pull vedantsatpute07/chor-vs-police:v2
@@ -81,7 +74,7 @@ docker ps
 # Open http://localhost:<port> in your browser
 ```
 
-### 🏗️ Option 3 — Build Docker Image Locally
+### 🏗️ Option 2 — Build Docker Image Locally
 ```bash
 git clone https://github.com/vedant-07-git/chor-vs-police.git
 cd chor-vs-police
