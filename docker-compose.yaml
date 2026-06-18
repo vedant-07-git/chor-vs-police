@@ -1,0 +1,8 @@
+services:
+  chor-vs-police:
+    build: .
+    container_name: chor-vs-police
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
